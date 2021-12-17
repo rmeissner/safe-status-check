@@ -1,5 +1,6 @@
 import axios from "axios"
 import { clientGateway } from "./config"
+import { InfoWithSource } from "./types"
 
 export interface AddressInfo {
     value: string
@@ -12,20 +13,34 @@ export interface RpcInfo {
 
 export interface ChainInfo {
     chainId: string
+    chainName: string
+    description: string
+    l2: boolean
     transactionService: string
     publicRpcUri: RpcInfo
 }
 
 export interface SafeInfo {
-    implementation: AddressInfo
+    implementation: AddressInfo,
+    threshold: number,
+    nonce: number,
+    owners: AddressInfo[]
 }
 
-export const loadChainInfo = async (shortName: string): Promise<ChainInfo> => {
-    const response = await axios.get<ChainInfo>(`${clientGateway()}/v1/chains/${shortName}`)
-    return response.data
+export const loadChainInfo = async (shortName: string): Promise<InfoWithSource<ChainInfo>> => {
+    const source = `${clientGateway()}/v1/chains/${shortName}`
+    const response = await axios.get<ChainInfo>(source)
+    return {
+        source,
+        content: response.data
+    }
 }
 
-export const loadSafeInfo = async (chainId: string, safeAddress: string): Promise<SafeInfo> => {
-    const response = await axios.get<SafeInfo>(`${clientGateway()}/v1/chains/${chainId}/safes/${safeAddress}`)
-    return response.data
+export const loadSafeInfo = async (chainId: string, safeAddress: string): Promise<InfoWithSource<SafeInfo>> => {
+    const source = `${clientGateway()}/v1/chains/${chainId}/safes/${safeAddress}`
+    const response = await axios.get<SafeInfo>(source)
+    return {
+        source,
+        content: response.data
+    }
 }

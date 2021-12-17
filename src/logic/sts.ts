@@ -2,6 +2,15 @@ import axios from "axios";
 import { ChainInfo, SafeInfo } from "./gcw";
 import { InfoWithSource } from "./types";
 
+export interface Page<T> {
+    count: number
+    results: T[]
+}
+
+export interface MultisigTransaction {
+    nonce: number
+}
+
 export interface MasterCopyState {
     address: string,
     version: string,
