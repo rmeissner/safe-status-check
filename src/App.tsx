@@ -1,4 +1,6 @@
 import { Accordion, AccordionDetails, AccordionSummary, Button, CircularProgress, List, ListItem, Paper, TextField, Typography } from '@mui/material';
+import { useMatch } from "react-router-dom";
+import { useNavigate } from 'react-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { CachingState, loadCachingState } from './logic/cachingState';
 import { buildRpcUrl } from './logic/config';
@@ -23,7 +25,7 @@ const renderResult = <T extends unknown>(input: Check<T> | undefined, renderInfo
 }
 
 function App() {
-
+  const navigate = useNavigate()
   const [addressInput, setAddressInput] = useState("")
   const [infuraKey, setInfuraKey] = useState(localStorage.getItem("SafeStatusCheck___InfuraKey") || "")
 
@@ -128,6 +130,24 @@ function App() {
       setSafeAddress({ status: "error", error: e instanceof Error ? e : new Error("Unknown error") })
     }
   }, [setSafeAddress])
+
+  const pathMatch = useMatch("/:safe");
+  const [lastPathSafe, setLastPathSafe] = useState("")
+  useEffect(() => {
+    const pathSafe = pathMatch?.params.safe
+    if (!!pathSafe && pathSafe !== lastPathSafe && pathSafe != addressInput) {
+      setLastPathSafe(pathSafe)
+      handleAddressInput(pathSafe)
+    }
+  }, [pathMatch, addressInput, lastPathSafe, setLastPathSafe])
+
+  useEffect(() => {
+    if (!safeAddress?.info) return
+    const pathElement = `${safeAddress?.info.network}:${safeAddress?.info.id}`
+    if (pathElement !== lastPathSafe) {
+      navigate(`/${pathElement}`)
+    }
+  }, [lastPathSafe, addressInput, safeAddress])
 
   return (<>
     <>

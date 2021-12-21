@@ -10,14 +10,15 @@ export interface CachingState {
 
 const loadMissingExecutedTxs = async (chainInfo: ChainInfo, safe: EIP3770Address, safeInfo: SafeInfo): Promise<number> => {
     const source = `${chainInfo.transactionService}/api/v1/safes/${safe.id}/multisig-transactions/?ordering=-nonce&trusted=true&limit=1&executed=true`
+    console.log("Missing Tx Source: ", source)
     const response = await axios.get<Page<MultisigTransaction>>(source)
     const txs = response.data.results
-    console.log({safeInfo, txs})
     return safeInfo.nonce - 1 - (txs.length > 0 ? txs[0].nonce : 0)
 }
 
 const loadQueuedTxs = async (chainInfo: ChainInfo, safe: EIP3770Address, safeInfo: SafeInfo): Promise<number> => {
-    const source = `${chainInfo.transactionService}/api/v1/safes/${safe.id}/multisig-transactions/?ordering=-nonce&trusted=true&limit=1&executed=false`
+    const source = `${chainInfo.transactionService}/api/v1/safes/${safe.id}/multisig-transactions/?ordering=-nonce&trusted=true&limit=1&executed=false&nonce__gte=${safeInfo.nonce}`
+    console.log("Queued Tx Source: ", source)
     const response = await axios.get<Page<MultisigTransaction>>(source)
     return response.data.count
 }
