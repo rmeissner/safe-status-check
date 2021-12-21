@@ -100,7 +100,7 @@ function App() {
         }
       })()
     }
-  }, [safeAddress, chainInfo, setCachingState])
+  }, [safeAddress, safeInfo, chainInfo, setCachingState])
 
   const [chainState, setChainState] = useState<Check<ChainState> | undefined>(undefined)
   useEffect(() => {
@@ -198,7 +198,7 @@ function App() {
       })}
       </AccordionDetails>
     </Accordion>
-    <Accordion expanded={!!chainState}>
+    <Accordion expanded={!!cachingState}>
       <AccordionSummary>Transaction Information</AccordionSummary>
       <AccordionDetails>{renderResult(cachingState, (info) => {
         return (<>
